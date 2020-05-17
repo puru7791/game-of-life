@@ -1,12 +1,16 @@
-node {
+pipeline{
+    agent{label 'GCP'}
+    stages{
+        stage('source'){
+            steps{
+                git 'https://github.com/puru7791/game-of-life.git'
+            }
+        }
+        stage('build'){
+            steps{
+                sh 'mvn clean package'
+            }
+        }
     
-    stage('scm') {
-    // some block
-        git 'https://github.com/shaikkhajaibrahim/game-of-life.git'
     }
-    
-    stage('packaging'){
-        sh 'mvn package'    
-    }
- 
 }
