@@ -1,5 +1,5 @@
 pipeline{
-    agent{label 'GCP'}
+    agent any
     stages{
         stage('source'){
             steps{
