@@ -6,6 +6,6 @@ RUN mvn clean package
 
 FROM tomcat:8
 LABEL author='Puru'
-COPY --from=mvn /game-of-life/gameoflife-web/target/gameoflife.war /usr/local/tomcat/webapps/gameoflife.war
+COPY --from=mvn gameoflife-web/target/gameoflife.war /usr/local/tomcat/webapps/gameoflife.war
 EXPOSE 8080
 CMD ["catalina.sh", "run"]
