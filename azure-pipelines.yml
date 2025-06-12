@@ -1,27 +1,48 @@
-trigger:
-- master
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
 
+trigger:
+- main
+
+variables:
+  dockerRegistryServiceConnection: 'ACR-ServiceConnection'
+  imageRepository: 'puru7791/gameoflife'
+  containerRegistry: 'myregistry.azurecr.io'
+  dockerfilePath: '$(System.DefaultWorkingDirectory)/Dockerfile'
+  imageTag: '$(Build.BuildId)'
+  ReleaseName: 'gameoflife'
+  Namespace: 'default'
+  KubernetesServiceConnection: 'azure-ado-connection-2'
 stages:
-  - stage: build
+  - stage: BuildAndPush
+    displayName: 'Docker Build and Push'
     jobs:
-      - job: 'build'
-        pool: 
-          vmImage: 'ubuntu-latest'
+      - job: Docker
+        displayName: 'Build and Push Docker Image'
         steps:
-          - task: Maven@3
+          - task: Docker@2
             inputs:
-              mavenPomFile: pom.xml
-              goals: package
-              publishJUnitResults: true
-              testResultsFiles: '**/surefire-reports/TEST-*.xml'
-              javaHomeOption: 'JDKVersion'
-              mavenVersionOption: 'Default'         
-              
-  - stage: deploy
-    jobs:
-      - job: 'installanduseterraform'
-        pool:
-          vmImage: 'ubuntu-latest'
-        steps:
-          - script: echo 'install terrform'
-          - script: echo 'executing terraform apply command'  
+              command: 'buildAndPush'
+              Dockerfile: '$(dockerfilePath)'
+              containerRegistry: '$(dockerRegistryServiceConnection)'
+              repository: '$(imageRepository)'
+              tags: |
+                $(imageTag)
+          # - task: HelmDeploy@1
+          #   inputs:
+          #     command: package
+
+          - task: HelmDeploy@1
+            inputs:
+              connectionType: 'Kubernetes Service Connection'
+              kubernetesServiceConnection: $(KubernetesServiceConnection)
+              namespace: $(Namespace)
+              command: upgrade
+              install: true
+              overrideValues: 'image.repository=$(containerRegistry)/$(imageRepository),image.tag=$(imageTag)'
+              chartType: FilePath
+              chartPath: '$(System.DefaultWorkingDirectory)/gameoflife-helm'
+              releaseName: $(ReleaseName)
+              arguments: '--timeout 30m'
