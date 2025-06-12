@@ -7,14 +7,17 @@ trigger:
 - main
 
 variables:
-  dockerRegistryServiceConnection: 'ACR-ServiceConnection'
+  dockerRegistryServiceConnection: 'docker-hub'
   imageRepository: 'puru7791/gameoflife'
-  containerRegistry: 'myregistry.azurecr.io'
   dockerfilePath: '$(System.DefaultWorkingDirectory)/Dockerfile'
   imageTag: '$(Build.BuildId)'
   ReleaseName: 'gameoflife'
   Namespace: 'default'
   KubernetesServiceConnection: 'azure-ado-connection-2'
+pool: 
+ name: 'my-self-hosted'
+ demands:
+  - agent.name -equals myagent-01
 stages:
   - stage: BuildAndPush
     displayName: 'Docker Build and Push'
@@ -41,7 +44,7 @@ stages:
               namespace: $(Namespace)
               command: upgrade
               install: true
-              overrideValues: 'image.repository=$(containerRegistry)/$(imageRepository),image.tag=$(imageTag)'
+              overrideValues: 'image.repository=$(imageRepository),image.tag=$(imageTag)'
               chartType: FilePath
               chartPath: '$(System.DefaultWorkingDirectory)/gameoflife-helm'
               releaseName: $(ReleaseName)
