@@ -25,6 +25,10 @@ stages:
       - job: Docker
         displayName: 'Build and Push Docker Image'
         steps:
+          - task: DockerInstaller@0
+            inputs:
+              dockerVersion: 17.09.0-ce
+              releaseType: stable
           - task: Docker@2
             inputs:
               command: 'buildAndPush'
@@ -36,16 +40,25 @@ stages:
           # - task: HelmDeploy@1
           #   inputs:
           #     command: package
-
-          - task: HelmDeploy@1
-            inputs:
-              connectionType: 'Kubernetes Service Connection'
-              kubernetesServiceConnection: $(KubernetesServiceConnection)
-              namespace: $(Namespace)
-              command: upgrade
-              install: true
-              overrideValues: 'image.repository=$(imageRepository),image.tag=$(imageTag)'
-              chartType: FilePath
-              chartPath: '$(System.DefaultWorkingDirectory)/gameoflife-helm'
-              releaseName: $(ReleaseName)
-              arguments: '--timeout 30m'
+  - stage: Helm_Deployment
+    displayName: 'Helm deployment to Dev'
+    jobs:
+      - deployment:
+        environment: dev
+        strategy:
+         runOnce:
+           deploy:
+             steps:
+              - task: HelmDeploy@1
+                inputs:
+                  connectionType: 'Kubernetes Service Connection'
+                  kubernetesServiceConnection: $(KubernetesServiceConnection)
+                  namespace: $(Namespace)
+                  command: upgrade
+                  install: true
+                  overrideValues: 'image.repository=$(imageRepository),image.tag=$(imageTag)'
+                  chartType: FilePath
+                  chartPath: '$(System.DefaultWorkingDirectory)/gameoflife-helm'
+                  releaseName: $(ReleaseName)
+                  arguments: '--timeout 30m'
+  
