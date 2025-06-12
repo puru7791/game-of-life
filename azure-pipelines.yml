@@ -13,7 +13,7 @@ variables:
   imageTag: '$(Build.BuildId)'
   ReleaseName: 'gameoflife'
   Namespace: 'default'
-  KubernetesServiceConnection: 'azure-ado-connection-2'
+  KubernetesServiceConnection: 'ado-aks-dev01'
 pool: 
  name: 'my-self-hosted'
  demands:
