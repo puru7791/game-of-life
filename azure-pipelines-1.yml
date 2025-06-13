@@ -29,17 +29,17 @@ steps:
 # - task: SonarQubeAnalyze@7
 #   inputs:
 #     jdkversion: 'JAVA_HOME_17_X64'
-- task: Gradle@4
+- task: Maven@4
   inputs:
-    gradleWrapperFile: 'gradlew'
-    tasks: 'build'
+    mavenPomFile: 'pom.xml'
     publishJUnitResults: true
-    testResultsFiles: '**/TEST-*.xml'
+    testResultsFiles: '**/surefire-reports/TEST-*.xml'
     javaHomeOption: 'JDKVersion'
+    mavenVersionOption: 'Default'
+    mavenAuthenticateFeed: false
+    effectivePomSkip: false
     sonarQubeRunAnalysis: true
-    sqGradlePluginVersionChoice: 'specify'
-    sonarQubeGradlePluginVersion: '2.6.1'
-    spotBugsAnalysis: false
+    sqMavenPluginVersionChoice: 'latest'
     
 - task: SonarQubePublish@7
   inputs:
