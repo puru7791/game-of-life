@@ -41,8 +41,13 @@ stages:
           #   inputs:
           #     command: package
   - stage: Helm_Deployment
-    displayName: 'Helm deployment to Dev'
+    displayName: 'Helm deployment to Dev AKS'
     jobs:
+      # - job: HelmDeploy
+      #   steps:
+      #   - task: HelmInstaller@1
+      #     inputs:
+      #       helmVersionToInstall: 'latest'
       - deployment:
         environment: dev
         strategy:
@@ -61,4 +66,5 @@ stages:
                   chartPath: '$(System.DefaultWorkingDirectory)/gameoflife-helm'
                   releaseName: $(ReleaseName)
                   arguments: '--timeout 30m'
+          
   
