@@ -19,10 +19,28 @@ steps:
   inputs:
     SonarQube: 'SonarQube-server'
     scannerMode: 'other'
+    extraProperties: |
+      # Additional properties that will be passed to the scanner,
+      # Put one key=value per line, example:
+      # sonar.exclusions=**/*.bin
+      sonar.projectKey=gameoflife
+      sonar.projectName=gameoflife
 
 # - task: SonarQubeAnalyze@7
 #   inputs:
 #     jdkversion: 'JAVA_HOME_17_X64'
+- task: Gradle@4
+  inputs:
+    gradleWrapperFile: 'gradlew'
+    tasks: 'build'
+    publishJUnitResults: true
+    testResultsFiles: '**/TEST-*.xml'
+    javaHomeOption: 'JDKVersion'
+    sonarQubeRunAnalysis: true
+    sqGradlePluginVersionChoice: 'specify'
+    sonarQubeGradlePluginVersion: '2.6.1'
+    spotBugsAnalysis: false
+    
 - task: SonarQubePublish@7
   inputs:
     pollingTimeoutSec: '300'
