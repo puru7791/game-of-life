@@ -6,8 +6,10 @@
 trigger:
 - master
 
-pool:
-  vmImage: ubuntu-latest
+pool: 
+ name: 'my-self-hosted'
+ demands:
+  - agent.name -equals myagent-01
 
 steps:
 - script: echo Hello, world!
